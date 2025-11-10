@@ -9,37 +9,40 @@ app.get("/", (req, res) => {
   res.send("Timestamp Microservice - Endpoint: /api/:date?");
 });
 
-// Ruta principal (ajustada para freeCodeCamp)
+// Endpoint ajustado para freeCodeCamp
 app.get("/api/:date?", (req, res) => {
-  const { date } = req.params;
-
+  const date = req.params.date;
   let dateObj;
 
-  // Si no se pasa parámetro, usar la fecha actual
   if (!date) {
+    // Sin parámetro -> fecha actual
     dateObj = new Date();
-  } else if (/^\d+$/.test(date)) {
-    // Si la fecha son solo números, interpretarlo como timestamp Unix
-    const timestamp = parseInt(date, 10);
-    dateObj = new Date(timestamp);
   } else {
-    // Si es una fecha tipo "2015-12-25"
-    dateObj = new Date(date);
+    // Si contiene solo dígitos -> timestamp
+    if (/^\d+$/.test(date)) {
+      // Convertir a entero
+      let ts = parseInt(date, 10);
+      // Si es un timestamp de 10 dígitos (segundos), convertir a ms
+      if (date.length === 10) ts *= 1000;
+      dateObj = new Date(ts);
+    } else {
+      // Si es una cadena de fecha (ej: 2015-12-25)
+      dateObj = new Date(date);
+    }
   }
 
-  // Si la fecha no es válida
-  if (dateObj.toString() === "Invalid Date") {
+  // Validación
+  if (isNaN(dateObj.getTime())) {
     return res.json({ error: "Invalid Date" });
   }
 
-  // Respuesta válida
-  res.json({
+  // Respuesta esperada
+  return res.json({
     unix: dateObj.getTime(),
-    utc: dateObj.toUTCString(),
+    utc: dateObj.toUTCString()
   });
 });
 
-// Iniciar servidor
 app.listen(PORT, () => {
   console.log(`Servidor corriendo en el puerto ${PORT}`);
 });
