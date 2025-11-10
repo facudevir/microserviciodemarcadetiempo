@@ -1,51 +1,41 @@
 // server.js
-const express = require('express');
+const express = require("express");
 const app = express();
 
 const PORT = process.env.PORT || 3000;
 
-// Ruta raíz opcional
-app.get('/', (req, res) => {
-  res.send('Timestamp Microservice - Endpoint: /api/:date?');
+// Ruta raíz
+app.get("/", (req, res) => {
+  res.send("Timestamp Microservice - Endpoint: /api/:date?");
 });
 
-// Ruta principal
-app.get('/', (req, res) => {
-  res.send('Timestamp Microservice - Endpoint: /api/:date?');
-});
-
+// Ruta principal (ajustada para freeCodeCamp)
+app.get("/api/:date?", (req, res) => {
   const { date } = req.params;
 
-  // Si no se pasa fecha, usar la fecha actual
+  let dateObj;
+
+  // Si no se pasa parámetro, usar la fecha actual
   if (!date) {
-    const now = new Date();
-    return res.json({ unix: now.getTime(), utc: now.toUTCString() });
-  }
-
-  let parsedDate;
-
-  // Si es un número (solo dígitos)
-  if (/^\d+$/.test(date)) {
-    let timestamp = parseInt(date, 10);
-    // Si tiene 10 dígitos, convertir segundos a milisegundos
-    if (date.length === 10) {
-      timestamp *= 1000;
-    }
-    parsedDate = new Date(timestamp);
+    dateObj = new Date();
+  } else if (/^\d+$/.test(date)) {
+    // Si la fecha son solo números, interpretarlo como timestamp Unix
+    const timestamp = parseInt(date, 10);
+    dateObj = new Date(timestamp);
   } else {
-    // Si no, intentar parsear como fecha normal
-    parsedDate = new Date(date);
+    // Si es una fecha tipo "2015-12-25"
+    dateObj = new Date(date);
   }
 
-  // Validar si la fecha es inválida
-  if (isNaN(parsedDate.getTime())) {
+  // Si la fecha no es válida
+  if (dateObj.toString() === "Invalid Date") {
     return res.json({ error: "Invalid Date" });
   }
 
-  // Respuesta correcta
-  return res.json({
-    unix: parsedDate.getTime(),
-    utc: parsedDate.toUTCString(),
+  // Respuesta válida
+  res.json({
+    unix: dateObj.getTime(),
+    utc: dateObj.toUTCString(),
   });
 });
 
@@ -53,3 +43,4 @@ app.get('/', (req, res) => {
 app.listen(PORT, () => {
   console.log(`Servidor corriendo en el puerto ${PORT}`);
 });
+
