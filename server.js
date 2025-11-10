@@ -6,11 +6,14 @@ const PORT = process.env.PORT || 3000;
 
 // Ruta raíz opcional
 app.get('/', (req, res) => {
-  res.send('Timestamp Microservice - Endpoint: /api/timestamp/:date?');
+  res.send('Timestamp Microservice - Endpoint: /api/:date?');
 });
 
 // Ruta principal
-app.get('/api/timestamp/:date?', (req, res) => {
+app.get('/', (req, res) => {
+  res.send('Timestamp Microservice - Endpoint: /api/:date?');
+});
+
   const { date } = req.params;
 
   // Si no se pasa fecha, usar la fecha actual
